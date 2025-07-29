@@ -1,0 +1,28 @@
+[project]
+name = "fastapi_songs"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Your Name",email = "you@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10, <4.0"
+dependencies = [
+]
+
+[tool.poetry]
+packages = [{include = "fastapi_songs", from = "src"}]
+
+[tool.poetry.scripts]
+fastapi_songs = "fastapi_songs.main:main"
+
+[tool.poetry.group.test.dependencies]
+flake8 = "^7.3.0"
+isort = "^6.0.1"
+pydocstyle = "^6.3.0"
+pre-commit = "^4.2.0"
+commitizen = "^4.8.3"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
