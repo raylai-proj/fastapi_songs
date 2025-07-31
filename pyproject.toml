@@ -23,6 +23,12 @@ pydocstyle = "^6.3.0"
 pre-commit = "^4.2.0"
 commitizen = "^4.8.3"
 
+
+[tool.poetry.group.dev.dependencies]
+fastapi = "0.75.0"
+sqlalchemy = "1.4.32"
+uvicorn = {version = "0.17.6", extras = ["standard"]}
+
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
