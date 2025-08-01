@@ -11,8 +11,8 @@ import uvicorn
 from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
 
-from .database import Base, engine, session_local
-from .models import Song
+from fastapi_songs.database import Base, engine, session_local
+from fastapi_songs.models import Song
 
 Base.metadata.create_all(bind=engine)
 
