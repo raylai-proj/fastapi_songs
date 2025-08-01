@@ -6,3 +6,7 @@ Author: Chun-Juei Lai
 Email: chunjueilai@gmail.com
 Date: 08/01/2025
 """
+
+from fastapi_songs.database import Base, engine
+
+Base.metadata.create_all(bind=engine)
