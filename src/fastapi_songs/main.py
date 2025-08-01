@@ -8,15 +8,36 @@ Date: 07/31/2025
 """
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
+from sqlalchemy.orm import Session
+
+from .database import Base, engine, session_local
+from .models import Song
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+
+def get_db():
+    """Get session to interact with db."""
+    db = session_local()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 @app.get("/")
 def root():
     """Fastapi website root entry."""
     return {"name": "FastAPI_songs"}
+
+
+@app.get("/songs/")
+def display_songs(db: Session = Depends(get_db)):
+    """Show song list."""
+    return db.query(Song).all()
 
 
 def main():
