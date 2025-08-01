@@ -7,8 +7,9 @@ Email: chunjueilai@gmail.com
 Date: 08/01/2025
 """
 
-from database import Base
 from sqlalchemy import Column, Date, Integer, String
+
+from fastapi_songs.database import Base
 
 
 class Song(Base):
