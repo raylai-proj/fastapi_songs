@@ -7,6 +7,8 @@ Email: chunjueilai@gmail.com
 Date: 08/01/2025
 """
 
-from fastapi_songs.database import Base, engine
+from fastapi_songs.database import Base, engine, session_local
 
 Base.metadata.create_all(bind=engine)
+
+db = session_local()
