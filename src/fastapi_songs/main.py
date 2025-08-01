@@ -1,6 +1,7 @@
 """
 Summary: main.py is FastAPI entry with all pages.
 
+Reference: https://github.com/duplxey/fastapi-songs/blob/master/main.py
 Name: Chun-Juei Lai
 Email: chunjueilai@gmail.com
 Date: 07/31/2025
