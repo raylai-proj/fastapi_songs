@@ -38,7 +38,7 @@ Base.metadata.create_all(bind=engine)
 
 db = session_local()
 
-if db.query(Song).count == 0:
+if db.query(Song).count() == 0:
 
     for song in DEFAULT_SONGS:
         db.add(song)
