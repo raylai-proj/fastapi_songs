@@ -9,7 +9,6 @@ commitizen==4.8.3
 decli==0.6.3
 distlib==0.4.0
 fastapi==0.75.0
--e git+ssh://git@github.com/raylai-proj/fastapi_songs.git@fc4d9cfdf083fc00686e01c6fafbd69e2669fce7#egg=fastapi_songs
 filelock==3.18.0
 flake8==7.3.0
 greenlet==3.2.3
