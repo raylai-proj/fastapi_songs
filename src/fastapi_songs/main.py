@@ -7,7 +7,7 @@ Email: chunjueilai@gmail.com
 Date: 07/31/2025
 """
 
-import uvicorn
+# import uvicorn
 from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
 
@@ -40,6 +40,6 @@ def display_songs(db: Session = Depends(get_db)):
     return db.query(Song).all()
 
 
-def main():
-    """Launch 'poetry run fastapi_songs' at root."""
-    uvicorn.run("fastapi_songs.main:app", host="127.0.0.1", port=8000, reload=True)
+# def main():
+#     """Launch 'poetry run fastapi_songs' at root."""
+#     uvicorn.run("fastapi_songs.main:app", host="127.0.0.1", port=8000, reload=True)
