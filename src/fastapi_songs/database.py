@@ -7,18 +7,26 @@ Email: chunjueilai@gmail.com
 Date: 08/01/2025
 """
 
-import os
+# import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DB_PATH = os.path.join(BASE_DIR, "default.db")
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# DB_PATH = os.path.join(BASE_DIR, "default.db")
+# SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
+USER = "fastapi-songs"
+PW = "complexpassword123"
+HOST = "localhost"
+PORT = "5432"
+DATABASE = "fastapi-songs"
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+POSTGRESQL_URL = f"postgresql://{USER}:{PW}@{HOST}:{PORT}/{DATABASE}"
+engine = create_engine(POSTGRESQL_URL)
+
+# engine = create_engine(
+#     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+# )
 session_local = sessionmaker(bind=engine, autoflush=False)
 Base = declarative_base()
