@@ -32,6 +32,7 @@ try:
 except Exception as e:
     print(e)
 
+
 postgersql_url = f"postgresql://{user}:{pw}@{host}:{port}/{database}"
 engine = create_engine(postgersql_url)
 
