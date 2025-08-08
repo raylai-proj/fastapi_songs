@@ -9,6 +9,7 @@ commitizen==4.8.3
 decli==0.6.3
 distlib==0.4.0
 fastapi==0.75.0
+# -e git+ssh://git@github.com/raylai-proj/fastapi_songs.git@6bfbfe94f7764f4902ce89e9ada47a49252e5cca#egg=fastapi_songs
 filelock==3.18.0
 flake8==7.3.0
 greenlet==3.2.3
@@ -26,6 +27,7 @@ packaging==25.0
 platformdirs==4.3.8
 pre_commit==4.2.0
 prompt_toolkit==3.0.51
+psycopg2-binary==2.9.3
 pycodestyle==2.14.0
 pydantic==1.10.22
 pydocstyle==6.3.0
