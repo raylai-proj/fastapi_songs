@@ -32,12 +32,12 @@ try:
 except Exception as e:
     print(e)
 
+finally:
+    postgersql_url = f"postgresql://{user}:{pw}@{host}:{port}/{database}"
+    engine = create_engine(postgersql_url)
 
-postgersql_url = f"postgresql://{user}:{pw}@{host}:{port}/{database}"
-engine = create_engine(postgersql_url)
-
-# engine = create_engine(
-#     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-# )
-session_local = sessionmaker(bind=engine, autoflush=False)
-Base = declarative_base()
+    # engine = create_engine(
+    #     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    # )
+    session_local = sessionmaker(bind=engine, autoflush=False)
+    Base = declarative_base()
