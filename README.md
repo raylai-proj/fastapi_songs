@@ -20,6 +20,19 @@ fastapi_songs/<br >
 │   └── config.yml<br >
 └── README.md<br >
 ## File: main.py
+The main.py register several instances and functions as following:<br >
+1. app = FastAPI(): The FastAPI() instance which allows functions decorated by @app become FastAPI.<br >
+2. @app.get("/") <br >
+   def root():<br >
+  The app root entry ("/") for testing and returning JSON {"name": "FastAPI_songs"}.<br >
+3. @app.get("/songs/") <br >
+  def display_songs(db: Session=Depends(get_db)): <br >
+  The app display_songs entry ("/songs/") to query preset songs list from database.<br >
+  - Lessons learned - `Depends(get_db)`: `Depends` is in Dependency Injection System in FastAPI which is a shortcut to call `get_db()` and return session as a function argument.<sub>[2]</sub><br >
+4. def get_db(): <br >
+  The get_db function starts a database session to handle connection and interaction between app and database.<sub>[3]</sub><br >
+  - Lessons learned - `yield db`: in addition to return db to request handler, `yield` pause and give control to request handler, and continue the program after it done.<sub>[4][5]</sub><br >
+   
 ### sqlalchemy
 ### SQLite
 ### uvicorn
@@ -40,3 +53,7 @@ fastapi_songs/<br >
 
 # Reference
 [1] [Deploying a FastAPI Application to Elastic Beanstalk](https://testdriven.io/blog/fastapi-elastic-beanstalk/#environment-variables)<br >
+[2] [FastAPI - Dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/)<br >
+[3] [SQLAlchemy 2.0 Documentation - Session Basics](https://docs.sqlalchemy.org/en/20/orm/session_basics.html)<br >
+[4] [How to Use Generators and yield in Python](https://realpython.com/introduction-to-python-generators/#understanding-the-python-yield-statement)<br >
+[5] [Dependencies with yield](https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/)<br >
