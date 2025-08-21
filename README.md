@@ -29,22 +29,23 @@ The main.py register several instances and functions as following:<br >
   def display_songs(db: Session=Depends(get_db)): <br >
   The app display_songs entry ("/songs/") to query preset songs list from database.<br >
   - Lessons learned - `db: Session=Depends(get_db)`: `db: Session` is argument name and type is Session object, and `Depends` is in Dependency Injection System in FastAPI which is a shortcut to call `get_db()` and return session as the function argument db.<sub>[2]</sub><br >
+  In summary, `:` means __type__, `=` means __default value__, `Depends` is tool function in FastAPI.<sub>[2][3]</sub><br >
 4. def get_db(): <br >
-  The get_db function starts a database session to handle connection and interaction between app and database.<sub>[3]</sub><br >
-  - Lessons learned - `yield db`: in addition to return db to request handler, `yield` pause and give control to request handler, and continue the program after it done.<sub>[4][5]</sub><br >
+  The get_db function starts a database session to handle connection and interaction between app and database.<sub>[4]</sub><br >
+  - Lessons learned - `yield db`: in addition to return db to request handler, `yield` pause and give control to request handler, and continue the program after it done.<sub>[5][6]</sub><br >
    
 ### SQLAlchemy
-SQLAlchemy is a Python library for working with database.<sub>[6]</sub> It includes several important tools for establishing connections and manipulating data in databases. Some key functions and classes include:<br >
-1. `sqlalchemy.create_engine()`: Establish a call as bridge to database. This includes creating a dialect to the database and a pool for establishing connection to local host.<sub>[7]</sub><br >
-2. `sqlalchemy.orm.sessionmaker()`: The orm stands for Object-Relational Mapping. This mapping maps database table (SQL) to Python classes and records (rows) into Python object. The sessionmaker generates a session object to interact (add, commit, query, and close) with the database.<sub>[8]</sub><br >
+SQLAlchemy is a Python library for working with database.<sub>[7]</sub> It includes several important tools for establishing connections and manipulating data in databases. Some key functions and classes include:<br >
+1. `sqlalchemy.create_engine()`: Establish a call as bridge to database. This includes creating a dialect to the database and a pool for establishing connection to local host.<sub>[8]</sub><br >
+2. `sqlalchemy.orm.sessionmaker()`: The orm stands for Object-Relational Mapping. This mapping maps database table (SQL) to Python classes and records (rows) into Python object. The sessionmaker generates a session object to interact (add, commit, query, and close) with the database.<sub>[9]</sub><br >
 - Lesson learned - SQLAlchemy connection workflow: create engine -> create session -> interact with database<br >
-3. `sqlalchemy.ext.declarative.declarative_base()`: The declarative_base declares a base class to let us inherit it and customized our database structure.<sub>[10]</sub><br >
-- Lesson learned - SQLAlchemy create SQL table workflow:<sub>[9][10][11]</sub><br >
+3. `sqlalchemy.ext.declarative.declarative_base()`: The declarative_base declares a base class to let us inherit it and customized our database structure.<sub>[11]</sub><br >
+- Lesson learned - SQLAlchemy create SQL table workflow:<sub>[10][11][12]</sub><br >
      (1) declare base class<br >
      (2) define customized class and inherit base class (register as a table model)<br >
      (3) using `metadata.create_all()` to check classes being defined and convert to SQL `CREATE TABLE` statements and create tables<br >
 
-In addition, SQLAlchemy provides schema related classes such as `Column`, `Date`, `Integer`, `String` to help define and regulate database structures.<sub>[12][13]</sub><br >
+In addition, SQLAlchemy provides schema related classes such as `Column`, `Date`, `Integer`, `String` to help define and regulate database structures.<sub>[13][14][15]</sub><br >
 ### SQLite
 ### uvicorn
 ## File: database.py
@@ -64,16 +65,18 @@ In addition, SQLAlchemy provides schema related classes such as `Column`, `Date`
 
 # Reference
 [1] [Deploying a FastAPI Application to Elastic Beanstalk](https://testdriven.io/blog/fastapi-elastic-beanstalk/#environment-variables)<br >
-[2] [FastAPI - Dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/)<br >
-[3] [SQLAlchemy 2.0 Documentation - Session Basics](https://docs.sqlalchemy.org/en/20/orm/session_basics.html)<br >
-[4] [How to Use Generators and yield in Python](https://realpython.com/introduction-to-python-generators/#understanding-the-python-yield-statement)<br >
-[5] [Dependencies with yield](https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/)<br >
-[6] [SQLAlchemy 2.0 Documentation - Overview](https://docs.sqlalchemy.org/en/20/intro.html#documentation-overview)<br >
-[7] [SQLAlchemy 2.0 Documentation - Engine Configuration](https://docs.sqlalchemy.org/en/20/core/engines.html)<br >
-[8] [SQLAlchemy 2.0 Documentation - Session API](https://docs.sqlalchemy.org/en/20/orm/session_api.html#sqlalchemy.orm.sessionmaker)<br >
-[9] [SQLAlchemy 2.0 Documentation - Declarative API](https://docs.sqlalchemy.org/en/20/orm/extensions/declarative/api.html#module-sqlalchemy.ext.declarative)<br >
-[10] [SQLAlchemy 2.0 Documentation - Class Mapping API](https://docs.sqlalchemy.org/en/20/orm/mapping_api.html#sqlalchemy.orm.DeclarativeBase.metadata)<br >
-[11] [SQLAlchemy 2.0 Documentation - Table Configuration with Declarative](https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#orm-declarative-metadata)<br >
-[12] [SQLAlchemy 2.0 Documentation - Describing Databases with MetaData](https://docs.sqlalchemy.org/en/20/core/metadata.html#sqlalchemy.schema.Column)<br >
-[13] [SQLAlchemy 2.0 Documentation - The Type Hierarchy](https://docs.sqlalchemy.org/en/20/core/type_basics.html)<br >
+[2] [Explicitly define datatype in a Python function](https://www.geeksforgeeks.org/python/explicitly-define-datatype-in-a-python-function/)<br >
+[3] [FastAPI - Dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/)<br >
+[4] [SQLAlchemy 2.0 Documentation - Session Basics](https://docs.sqlalchemy.org/en/20/orm/session_basics.html)<br >
+[5] [How to Use Generators and yield in Python](https://realpython.com/introduction-to-python-generators/#understanding-the-python-yield-statement)<br >
+[6] [Dependencies with yield](https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/)<br >
+[7] [SQLAlchemy 2.0 Documentation - Overview](https://docs.sqlalchemy.org/en/20/intro.html#documentation-overview)<br >
+[8] [SQLAlchemy 2.0 Documentation - Engine Configuration](https://docs.sqlalchemy.org/en/20/core/engines.html)<br >
+[9] [SQLAlchemy 2.0 Documentation - Session API](https://docs.sqlalchemy.org/en/20/orm/session_api.html#sqlalchemy.orm.sessionmaker)<br >
+[10] [SQLAlchemy 2.0 Documentation - Declarative API](https://docs.sqlalchemy.org/en/20/orm/extensions/declarative/api.html#module-sqlalchemy.ext.declarative)<br >
+[11] [SQLAlchemy 2.0 Documentation - Class Mapping API](https://docs.sqlalchemy.org/en/20/orm/mapping_api.html#sqlalchemy.orm.DeclarativeBase.metadata)<br >
+[12] [SQLAlchemy 2.0 Documentation - Table Configuration with Declarative](https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#orm-declarative-metadata)<br >
+[13] [SQLAlchemy 2.0 Documentation - Describing Databases with MetaData](https://docs.sqlalchemy.org/en/20/core/metadata.html#sqlalchemy.schema.Column)<br >
+[14] [SQLAlchemy 2.0 Documentation - The Type Hierarchy](https://docs.sqlalchemy.org/en/20/core/type_basics.html)<br >
+[15] [Column and Data Types in SQLAlchemy](https://www.geeksforgeeks.org/python/column-and-data-types-in-sqlalchemy/)<br >
 
