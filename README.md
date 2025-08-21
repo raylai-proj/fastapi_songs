@@ -65,8 +65,19 @@ In addition, SQLAlchemy provides schema related classes such as `Column`, `Date`
   2. `os.path.abspath(__file__)` returns executed module absolute path. Because `__file__` can be relative or absolute path depends on Python version, I used `os.path.abspath(__file__)` to make sure we get absolute path.<sub>[19]</sub><br >
   3. `os.path.dirname(current_path)` returns directory name of current path which means it returns path one up layer.<sub>[20][21]</sub><br >
   4. `os.path.join(var1,...)` can receive any number path variables and add them up as a path sequentially with "/" between each of them. If one path variable is absolute path (has `/` or `C:\`), the path variables before the absolute path will be discarded.<sub>[22]</sub><br >
-### uvicorn
+### Uvicorn
 Uvicorn is an ASGI compatible web server which helps receive browser/client requests and hand over to FastAPI to process requests.<sub>[23]</sub><br >
+- Lesson learned: Run FastAPI with uvicorn using Poetry:<br >
+- Issue: Bash: `(venv)$ poetry run uvicorn fastapi_songs.main:app --reload --port 8000`
+- Reason: Though the tutorial showed command to execute FastAPI with Uvicorn, with Poetry, I was seeking a way to write code in main.py and simply run command `Poetry run fastapi_songs`<br >
+- Fix<sub>[24]</sub>:
+  ```python
+  import uvicorn
+  def main():
+    """Launch 'poetry run fastapi_songs' at root."""
+    uvicorn.run("fastapi_songs.main:app", host="127.0.0.1", port=8000, reload=True)
+  ```
+  - Explanation: Instead of inputting command, I wrapped the commands into main() with detail, such as uvicorn.run(file string, host=, port=, reeload=) to be simplifed executing command in bash.<sub>[24]</sub><br >
 ## File: database.py
 ## File: models.py
 # AWS Elastic Beanstalk
@@ -106,4 +117,5 @@ Uvicorn is an ASGI compatible web server which helps receive browser/client requ
 [21] [Python | os.path.dirname() method](https://www.geeksforgeeks.org/python/python-os-path-dirname-method/)<br >
 [22] [os.path — Common pathname manipulations - os.path.join(path, /, *paths)](https://docs.python.org/3/library/os.path.html#os.path.join)<br >
 [23] [What is the purpose of Uvicorn?](https://stackoverflow.com/questions/71435960/what-is-the-purpose-of-uvicorn)<br >
+[24] [How to run FastAPI application from Poetry?](https://stackoverflow.com/questions/63809553/how-to-run-fastapi-application-from-poetry)<br >
 
