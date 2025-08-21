@@ -47,6 +47,24 @@ SQLAlchemy is a Python library for working with database.<sub>[7]</sub> It inclu
 
 In addition, SQLAlchemy provides schema related classes such as `Column`, `Date`, `Integer`, `String` to help define and regulate database structures.<sub>[13][14][15]</sub><br >
 ### SQLite
+- Lesson learned - SQLite database URL setting:<br >
+- Issue: After setting up the app, I noticed the init_db.py didn't create preset data into database.<br >
+- Reason: I realized the project structure I used is __src layout__ compare to __flat layout__ which the tutorial provided. Because the SQLite used __relative path__, src layout turned out init_db.py created database which `display_songs()` in main.py couldn't reach.<br >
+- Fix: I changed from __relative path__ to __absolute path__ for SQLite.<br >
+  - Original SQLite path: `"sqlite:///./default.db"`<br >
+  - Explanation: The `"sqlit:///"` is sqlite path prefix used in SQLAlchemy. The `"./"` means current directory.<sub>[16]</sub><br >
+  - Fixed SQLite path:<br >
+  ```python
+  import os
+  BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+  DB_PATH = os.path.join(BASE_DIR, "default.db")
+  SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
+  ```
+  - Explanation:<br >
+  1. `__file__` is a python built-in variable which stores current module path when being executed.<sub>[17][18]</sub><br >
+  2. `os.path.abspath(__file__)` returns executed module absolute path. Because `__file__` can be relative or absolute path depends on Python version, I used `os.path.abspath(__file__)` to make sure we get absolute path.<sub>[18]</sub><br >
+  3. `os.path.dirname(current_path)` returns directory name of current path which means it returns path one up layer.<sub>[19]</sub><br >
+  4. `os.path.join(var1,...)` can receive any number path variables and add them up as a path sequentially with "/" between each of them. If one path variable is absolute path (has `/` or `C:\`), the path variables before the absolute path will be discarded.<sub>[19]</sub><br >
 ### uvicorn
 ## File: database.py
 ## File: models.py
@@ -79,4 +97,8 @@ In addition, SQLAlchemy provides schema related classes such as `Column`, `Date`
 [13] [SQLAlchemy 2.0 Documentation - Describing Databases with MetaData](https://docs.sqlalchemy.org/en/20/core/metadata.html#sqlalchemy.schema.Column)<br >
 [14] [SQLAlchemy 2.0 Documentation - The Type Hierarchy](https://docs.sqlalchemy.org/en/20/core/type_basics.html)<br >
 [15] [Column and Data Types in SQLAlchemy](https://www.geeksforgeeks.org/python/column-and-data-types-in-sqlalchemy/)<br >
+[16] [SQLAlchemy engine absolute path URL in windows](https://stackoverflow.com/questions/19260067/sqlalchemy-engine-absolute-path-url-in-windows)<br >
+[17] [what does the __file__ variable mean/do?](https://stackoverflow.com/questions/9271464/what-does-the-file-variable-mean-do)<br >
+[18] [PEP 451 – A ModuleSpec Type for the Import System](https://peps.python.org/pep-0451/)<br >
+[19] [os.path — Common pathname manipulations](https://docs.python.org/3/library/os.path.html)<br >
 
