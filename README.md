@@ -62,9 +62,9 @@ In addition, SQLAlchemy provides schema related classes such as `Column`, `Date`
   ```
   - Explanation:<br >
   1. `__file__` is a python built-in variable which stores current module path when being executed.<sub>[17][18]</sub><br >
-  2. `os.path.abspath(__file__)` returns executed module absolute path. Because `__file__` can be relative or absolute path depends on Python version, I used `os.path.abspath(__file__)` to make sure we get absolute path.<sub>[18]</sub><br >
-  3. `os.path.dirname(current_path)` returns directory name of current path which means it returns path one up layer.<sub>[19]</sub><br >
-  4. `os.path.join(var1,...)` can receive any number path variables and add them up as a path sequentially with "/" between each of them. If one path variable is absolute path (has `/` or `C:\`), the path variables before the absolute path will be discarded.<sub>[19]</sub><br >
+  2. `os.path.abspath(__file__)` returns executed module absolute path. Because `__file__` can be relative or absolute path depends on Python version, I used `os.path.abspath(__file__)` to make sure we get absolute path.<sub>[19]</sub><br >
+  3. `os.path.dirname(current_path)` returns directory name of current path which means it returns path one up layer.<sub>[20][21]</sub><br >
+  4. `os.path.join(var1,...)` can receive any number path variables and add them up as a path sequentially with "/" between each of them. If one path variable is absolute path (has `/` or `C:\`), the path variables before the absolute path will be discarded.<sub>[22]</sub><br >
 ### uvicorn
 ## File: database.py
 ## File: models.py
@@ -100,5 +100,8 @@ In addition, SQLAlchemy provides schema related classes such as `Column`, `Date`
 [16] [SQLAlchemy engine absolute path URL in windows](https://stackoverflow.com/questions/19260067/sqlalchemy-engine-absolute-path-url-in-windows)<br >
 [17] [what does the __file__ variable mean/do?](https://stackoverflow.com/questions/9271464/what-does-the-file-variable-mean-do)<br >
 [18] [PEP 451 – A ModuleSpec Type for the Import System](https://peps.python.org/pep-0451/)<br >
-[19] [os.path — Common pathname manipulations](https://docs.python.org/3/library/os.path.html)<br >
+[19] [os.path — Common pathname manipulations - os.path.abspath(path)](https://docs.python.org/3/library/os.path.html#os.path.abspath)<br >
+[20] [os.path — Common pathname manipulations - os.path.dirname](https://docs.python.org/3/library/os.path.html#os.path.dirname)<br >
+[21] [Python | os.path.dirname() method](https://www.geeksforgeeks.org/python/python-os-path-dirname-method/)<br >
+[22] [os.path — Common pathname manipulations - os.path.join(path, /, *paths)](https://docs.python.org/3/library/os.path.html#os.path.join)<br >
 
