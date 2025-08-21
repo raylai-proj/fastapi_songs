@@ -66,6 +66,7 @@ In addition, SQLAlchemy provides schema related classes such as `Column`, `Date`
   3. `os.path.dirname(current_path)` returns directory name of current path which means it returns path one up layer.<sub>[20][21]</sub><br >
   4. `os.path.join(var1,...)` can receive any number path variables and add them up as a path sequentially with "/" between each of them. If one path variable is absolute path (has `/` or `C:\`), the path variables before the absolute path will be discarded.<sub>[22]</sub><br >
 ### uvicorn
+Uvicorn is an ASGI compatible web server which helps receive browser/client requests and hand over to FastAPI to process requests.<sub>[23]</sub><br >
 ## File: database.py
 ## File: models.py
 # AWS Elastic Beanstalk
@@ -104,4 +105,5 @@ In addition, SQLAlchemy provides schema related classes such as `Column`, `Date`
 [20] [os.path — Common pathname manipulations - os.path.dirname](https://docs.python.org/3/library/os.path.html#os.path.dirname)<br >
 [21] [Python | os.path.dirname() method](https://www.geeksforgeeks.org/python/python-os-path-dirname-method/)<br >
 [22] [os.path — Common pathname manipulations - os.path.join(path, /, *paths)](https://docs.python.org/3/library/os.path.html#os.path.join)<br >
+[23] [What is the purpose of Uvicorn?](https://stackoverflow.com/questions/71435960/what-is-the-purpose-of-uvicorn)<br >
 
