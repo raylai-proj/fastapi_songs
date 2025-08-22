@@ -78,7 +78,8 @@ Uvicorn is an ASGI compatible web server which helps receive browser/client requ
     uvicorn.run("fastapi_songs.main:app", host="127.0.0.1", port=8000, reload=True)
   ```
   - Explanation: Instead of inputting command, I wrapped the commands into main() with detail, such as uvicorn.run(file string, host=, port=, reeload=) to be simplifed executing command in bash.<sub>[24]</sub><br >
-## File: database.py
+## File: database.py<br >
+The database.py declares default database path for SQLite, creates SQLAlchemy engine, session, and declarative_base for further use in models.py, init_db.py, and main.py.<br >
 ## File: models.py
 # AWS Elastic Beanstalk
 ## SSH
