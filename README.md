@@ -80,7 +80,15 @@ Uvicorn is an ASGI compatible web server which helps receive browser/client requ
   - Explanation: Instead of inputting command, I wrapped the commands into main() with detail, such as uvicorn.run(file string, host=, port=, reeload=) to be simplifed executing command in bash.<sub>[24]</sub><br >
 ## File: database.py<br >
 The database.py declares default database path for SQLite, creates SQLAlchemy engine, session, and declarative_base for further use in models.py, init_db.py, and main.py.<br >
-## File: models.py
+## File: models.py<br >
+The models.py inherits Base from database.py and define Song's database structure. The Song class defines the schema which includes __id__, __title__, __artist__, and __release\_date__ for each column and will store in database.<br >
+1. Lesson learned: Why do we need declare \_\_tablename\_\_?
+- Issue: When following tutorial, I didn't see any variable used \_\_tablename\_\_ once it declared, and I have a question why we should declared it.<br >
+- Reason: When we define the data structure that inherits Base, the class (data structure) is mapped to the table in SQLite using \_\_tablename\_\_ by SQLAlchemy. Although SQLAlchemy will auto-generat \_\_tablename\_\_ (default is class name with lowercase and pluralized), declaring when I write the data structure class can potentially prevent naming conflict and model-table mismatch.<sub>[25]</sub><br > 
+- Fix: I followed the tutorial and declared `__tablename__ = "songs"`
+2. Lesson learned: The update of `sqlalchemy.Column` and `sqlalchemy.ext.declarative.declarative_base()`<br >
+- Issue: The `sqlalchemy.Column` and `sqlalchemy.ext.declarative.declarative_base()` is old style in declareing column and declarative base.<br >
+- Reason: Althouugh the update style in __SQLAlchemy 2.0+__ is `sqlalchemy.mapped_column` and `sqlalchemy.orm.DeclarativeBase()`, the SQLAlchemy version in tutorial is 1.4.32, so I followed the tutorial to continue use `Column` and `declarative_base()` in this project.<sub>[26][27]</sub><br >
 # AWS Elastic Beanstalk
 ## SSH
 ## DNS CNAME Prefix
@@ -119,4 +127,7 @@ The database.py declares default database path for SQLite, creates SQLAlchemy en
 [22] [os.path — Common pathname manipulations - os.path.join(path, /, *paths)](https://docs.python.org/3/library/os.path.html#os.path.join)<br >
 [23] [What is the purpose of Uvicorn?](https://stackoverflow.com/questions/71435960/what-is-the-purpose-of-uvicorn)<br >
 [24] [How to run FastAPI application from Poetry?](https://stackoverflow.com/questions/63809553/how-to-run-fastapi-application-from-poetry)<br >
+[25] [SQLAlchemy 2.0 Documentation - The table, or other from clause object](https://docs.sqlalchemy.org/en/20/orm/mapping_styles.html#the-table-or-other-from-clause-object)<br >
+[26] [SQLAlchemy 2.0 Documentation - Declarative Table with mapped_column()](https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#orm-declarative-table)<br >
+[27] [SQLAlchemy 2.0 Documentation - sqlalchemy.orm.DeclarativeBase](https://docs.sqlalchemy.org/en/20/orm/mapping_api.html#sqlalchemy.orm.DeclarativeBase)<br >
 
