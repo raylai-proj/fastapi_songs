@@ -90,8 +90,48 @@ The models.py inherits Base from database.py and define Song's database structur
 - Issue: The `sqlalchemy.Column` and `sqlalchemy.ext.declarative.declarative_base()` is old style in declareing column and declarative base.<br >
 - Reason: Althouugh the update style in __SQLAlchemy 2.0+__ is `sqlalchemy.mapped_column` and `sqlalchemy.orm.DeclarativeBase()`, the SQLAlchemy version in tutorial is 1.4.32, so I followed the tutorial to continue use `Column` and `declarative_base()` in this project.<sub>[26][27]</sub><br >
 # AWS Elastic Beanstalk
-- What is Elastic Beanstalk?   Elastic Beanstalk is a __Platform-as-a-Service (PaaS)__ that helps users to deploy their applications on AWS while integrating multiple AWS services. In this project, the main AWS services I used include, __Elastic Compute Cloud (EC2)__, Relational Database Service (RDS)__, and __Elastic Load Balancing (ELB)__. I used Elastic Beanstalk to deploy my apps, and while I selected `db.t3.micro` as my database instance class, the Elastic Beanstalk automatically selected `t3.micro, t3.small` as my EC2 instance type and assigned me EC2 when I deployed applications.<sub>[1][28]</sub><br >
+What is Elastic Beanstalk?   Elastic Beanstalk is a __Platform-as-a-Service (PaaS)__ that helps users to deploy their applications on AWS while integrating multiple AWS services. In this project, the main AWS services I used include, __Elastic Compute Cloud (EC2)__, Relational Database Service (RDS)__, and __Elastic Load Balancing (ELB)__. I used Elastic Beanstalk to deploy my apps, and while I selected `db.t3.micro` as my database instance class, the Elastic Beanstalk automatically selected `t3.micro, t3.small` as my EC2 instance type and assigned me EC2 when I deployed applications.<sub>[1][28]</sub><br >
 To utilize Elastic Beanstalk, I followed tutorial to install Elastic Beanstalk command line interface (EB CLI).<sub>[29][30][31]</sub> The EB CLI is a tool let me setup, configure, deploy, and manage my Elastic Beanstalk application in linux.<sub>[30]</sub><br >
+## Initialize Project
+To initizlize my project, I type `eb init`, and CLI prompts:<br >
+1. Select Default Region: Tokyo, Japan <br >
+2. What's you application name (default: fastapi_songs): enter for default <br >
+3. What's Platform and Platform Branch: Python 3.11 running on 64bit Amazon Linux 2023 <br >
+4. Codecommit: no (followed the tutorial) <br >
+5.SSH to connect to EC2 instance: yes (followed the tutorial)<br >
+6. Ask for Keypair: I additionally generated an RSA SSH Keypair and imported as follows: <br >
+- Generate RSA SSH Keypair: <br >
+```Bash
+ssh-keygen -t rsa -b 2048 -f ~/.ssh/eb_keypair
+```
+- Import the Keypair to EC2: <br >
+```Bash
+aws ec2 import-key-pair \
+  --key-name eb_keypair \
+  --public-key-material fileb://~/.ssh/eb_keypair.pub
+```
+After `eb init`, my project generated `config.yml` under directory `.elasticbeanstalk`. <br >
+My `config.yml`: <br >
+```Python
+branch-defaults:
+  main:
+    environment: fastapi-songs-dev
+    group_suffix: null
+global:
+  application_name: fastapi_songs
+  branch: null
+  default_ec2_keyname: aws-eb
+  default_platform: Python 3.11 running on 64bit Amazon Linux 2023
+  default_region: ap-northeast-1
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  profile: eb-cli
+  repository: null
+  sc: git
+  workspace_type: Application
+```
 While setting up my app on AWS, I encountered several issues and took note as below: <br >
 1. Lesson learned: Order to setup Python, virtual environment, EB CLI.<br >
 - Issue: I noticed that there was no Python under my WSL, and the instruction asked to install EB CLI under virtual environment with python.<br >
