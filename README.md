@@ -91,7 +91,8 @@ The models.py inherits Base from database.py and define Song's database structur
 - Reason: Althouugh the update style in __SQLAlchemy 2.0+__ is `sqlalchemy.mapped_column` and `sqlalchemy.orm.DeclarativeBase()`, the SQLAlchemy version in tutorial is 1.4.32, so I followed the tutorial to continue use `Column` and `declarative_base()` in this project.<sub>[26][27]</sub><br >
 # AWS Elastic Beanstalk
 - What is Elastic Beanstalk?   Elastic Beanstalk is a __Platform-as-a-Service (PaaS)__ that helps users to deploy their applications on AWS while integrating multiple AWS services. In this project, the main AWS services I used include, __Elastic Compute Cloud (EC2)__, Relational Database Service (RDS)__, and __Elastic Load Balancing (ELB)__. I used Elastic Beanstalk to deploy my apps, and while I selected `db.t3.micro` as my database instance class, the Elastic Beanstalk automatically selected `t3.micro, t3.small` as my EC2 instance type and assigned me EC2 when I deployed applications.<sub>[1][28]</sub><br >
-## SSH
+To utilize Elastic Beanstalk, I followed tutorial to install Elastic Beanstalk command line interface (EB CLI).<sub>[29][30][31]</sub> The EB CLI is a tool let me setup, configure, deploy, and manage my Elastic Beanstalk application in linux.<sub>[30]</sub><br >
+## EC2 SSH
 ## DNS CNAME Prefix
 ## Load Balancer
 ## gunicorn
@@ -132,4 +133,7 @@ The models.py inherits Base from database.py and define Song's database structur
 [26] [SQLAlchemy 2.0 Documentation - Declarative Table with mapped_column()](https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#orm-declarative-table)<br >
 [27] [SQLAlchemy 2.0 Documentation - sqlalchemy.orm.DeclarativeBase](https://docs.sqlalchemy.org/en/20/orm/mapping_api.html#sqlalchemy.orm.DeclarativeBase)<br >
 [28] [What is AWS Elastic Beanstalk?](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html)<br >
+[29] [aws-elastic-beanstalk-cli-setup](https://github.com/aws/aws-elastic-beanstalk-cli-setup)<br >
+[30] [awsebcli 3.25](https://pypi.org/project/awsebcli/)<br >
+[31] [Installing or updating to the latest version of the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)<br >
 
