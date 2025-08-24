@@ -92,6 +92,57 @@ The models.py inherits Base from database.py and define Song's database structur
 # AWS Elastic Beanstalk
 - What is Elastic Beanstalk?   Elastic Beanstalk is a __Platform-as-a-Service (PaaS)__ that helps users to deploy their applications on AWS while integrating multiple AWS services. In this project, the main AWS services I used include, __Elastic Compute Cloud (EC2)__, Relational Database Service (RDS)__, and __Elastic Load Balancing (ELB)__. I used Elastic Beanstalk to deploy my apps, and while I selected `db.t3.micro` as my database instance class, the Elastic Beanstalk automatically selected `t3.micro, t3.small` as my EC2 instance type and assigned me EC2 when I deployed applications.<sub>[1][28]</sub><br >
 To utilize Elastic Beanstalk, I followed tutorial to install Elastic Beanstalk command line interface (EB CLI).<sub>[29][30][31]</sub> The EB CLI is a tool let me setup, configure, deploy, and manage my Elastic Beanstalk application in linux.<sub>[30]</sub><br >
+1. Lesson learned: Order to setup Python, virtual environment, EB CLI.<br >
+- Issue: I noticed that there was no Python under my WSL, and the instruction asked to install EB CLI under virtual environment with python.<br >
+- Reason: My Python was installed under Windows, and this is the first project I started under WSL which neither Python and virtual environment were installed.<br >
+- Fix: I chose to install pyenv which provide both Python and venv.<sub>[32]</sub> After that, I further installed EB CLI under virtual environment.<br >
+2. Lesson learned: When I `eb init` and selected aws default region, the CLI prompts:<br >
+     > You have not yet set up your credentials or your credentials are incorrect<br >
+     > You must provide your credentials.<br >
+     > (aws-access-id):<br >
+- Issue: The Elastic Beanstalk CLI (eb) cannot find my AWS credentials.<br >
+- Reason: I didn't setup my aws access key and secret<br >
+- Fix: I have to create an AWS __IAM user__ with access key in aws console. To do that:<br >
+   1. I went to AWS console: https://console.aws.amazon.com/ <br >
+   2. Selected my account on _top right_ and selected __Security credentials__ <br >
+   3. On left sidebar, I selected __Dashboard__ -> __Access Management__ -> __Users__ <br >
+   4. I selected __Create User__, type User name:  _eb\_cli\_user_ -> __Next__ <br >
+   5. In Permission Options, I selected __Attach policies directly__. Then search and add `AdministratorAccess-AWSElasticBeanstalk`, `AmazonEC2FullAccess` -> __Next__ -> __Create user__ <br >
+   6. I selected _eb\_cli\_user_ and selected __Create access key__ in Summary<br >
+   7. I selected __Command Line Interface (CLI)__ -> checked __Confirmation__ -> __Next__ <br >
+   8. I left _Set description tag - optional_ empty -> __Create access key__ <br >
+   9. After that, I got back to linux and `aws configure` and input: <br >
+      > AWS Access Key ID [None]: <access-key-id> <br >
+      > AWS Secret Access Key [None]: <secret-access-key> <br >
+      > Default region name [None]: <br >
+      > Default output format [None]: json <br >
+   10. Then I checked access key, secret key, and region setting by `aws configure list` <br >
+   11. [optional]: To refresh aws cli, I `rm -rf ~/.aws/cli/cache` and restart shell by `exec $SHELL`
+3. Lesson learned: After I input my AWS IAM user and access key, then I `eb init`, and the CLI prompts:<br >
+   > not authorized to perform: s3:PutBucketOwnershipControls on resource: <br >
+   > "arn:aws:s3:::elasticbeanstalk" because no identity-based policy allows the s3:PutBucketOwnershipControls action <br >
+- Issue : Elastic Beanstalk uses an S3 bucket to store my app versions and environment data, but it failed <br >
+- Reason: My IAM user (eb_cli_user) does not have permission to creates or configures S3 bucket.<br >
+- Fix: I have to create permissions `s3:PutBucketOwnershipControls` at:<br >
+   1. AWS IAM console: https://console.aws.amazon.com/iam
+   2. On left sidebar, I selected __Dashboard__ -> __Access Management__ -> __Users__ <br >
+   3. I selected _eb\_cli\_user_ and in __Permissions policies__, I selected __Add permissions__ -> __Create inline policy__ <br >
+   4. I selected __JSON__ in _Policy editor_ and added:<br >
+   ```JSON
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Effect": "Allow",
+         "Action": [
+           "s3:PutBucketOwnershipControls"
+         ],
+         "Resource": "arn:aws:s3:::elasticbeanstalk-*"
+       }
+     ]
+   }
+   ```
+   5. I clicked __Next__ and added Policy name `s3PutBucketOwnershipControls` -> __Create policy__ <br >
 ## EC2 SSH
 ## DNS CNAME Prefix
 ## Load Balancer
@@ -136,4 +187,5 @@ To utilize Elastic Beanstalk, I followed tutorial to install Elastic Beanstalk c
 [29] [aws-elastic-beanstalk-cli-setup](https://github.com/aws/aws-elastic-beanstalk-cli-setup)<br >
 [30] [awsebcli 3.25](https://pypi.org/project/awsebcli/)<br >
 [31] [Installing or updating to the latest version of the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)<br >
+[32] [Github - pyenv](https://github.com/pyenv/pyenv)<br >
 
