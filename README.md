@@ -143,7 +143,7 @@ While setting up my app on AWS, I encountered several issues and took note as be
      > (aws-access-id):<br >
 - Issue: The Elastic Beanstalk CLI (eb) cannot find my AWS credentials.<br >
 - Reason: I didn't setup my aws access key and secret<br >
-- Fix: I have to create an AWS __IAM user__ with access key in aws console. To do that:<br >
+- Fix: I have to create an AWS __IAM user__ with access key in aws console.<sub>[33]</sub> To do that:<br >
    1. I went to AWS console: https://console.aws.amazon.com/ <br >
    2. Selected my account on _top right_ and selected __Security credentials__ <br >
    3. On left sidebar, I selected __Dashboard__ -> __Access Management__ -> __Users__ <br >
@@ -164,7 +164,7 @@ While setting up my app on AWS, I encountered several issues and took note as be
    > "arn:aws:s3:::elasticbeanstalk" because no identity-based policy allows the s3:PutBucketOwnershipControls action <br >
 - Issue : Elastic Beanstalk uses an S3 bucket to store my app versions and environment data, but it failed <br >
 - Reason: My IAM user (eb_cli_user) does not have permission to creates or configures S3 bucket.<br >
-- Fix: I have to create permissions `s3:PutBucketOwnershipControls` at:<br >
+- Fix: I have to create permissions `s3:PutBucketOwnershipControls` at:<sub>[34]</sub><br >
    1. AWS IAM console: https://console.aws.amazon.com/iam
    2. On left sidebar, I selected __Dashboard__ -> __Access Management__ -> __Users__ <br >
    3. I selected _eb\_cli\_user_ and in __Permissions policies__, I selected __Add permissions__ -> __Create inline policy__ <br >
@@ -174,10 +174,10 @@ While setting up my app on AWS, I encountered several issues and took note as be
      "Version": "2012-10-17",
      "Statement": [
        {
-         "Effect": "Allow",
          "Action": [
            "s3:PutBucketOwnershipControls"
          ],
+         "Effect": "Allow",
          "Resource": "arn:aws:s3:::elasticbeanstalk-*"
        }
      ]
@@ -229,4 +229,6 @@ While setting up my app on AWS, I encountered several issues and took note as be
 [30] [awsebcli 3.25](https://pypi.org/project/awsebcli/)<br >
 [31] [Installing or updating to the latest version of the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)<br >
 [32] [Github - pyenv](https://github.com/pyenv/pyenv)<br >
+[33] [How do I get my AWS Access ID and Secret Key for EB CLI?](https://www.reddit.com/r/aws/comments/zfr0m6/how_do_i_get_my_aws_access_id_and_secret_key_for/)<br >
+[34] [Managing Elastic Beanstalk user policies](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/AWSHowTo.iam.managed-policies.html)<br >
 
