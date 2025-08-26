@@ -132,7 +132,7 @@ global:
   sc: git
   workspace_type: Application
 ```
-While setting up my app on AWS, I encountered several issues and took note as below: <br >
+While initializing configuration for my project, I encountered several issues and took note as below: <br >
 1. Lesson learned: Order to setup Python, virtual environment, EB CLI.<br >
 - Issue: I noticed that there was no Python under my WSL, and the instruction asked to install EB CLI under virtual environment with python.<br >
 - Reason: My Python was installed under Windows, and this is the first project I started under WSL which neither Python and virtual environment were installed.<br >
@@ -189,11 +189,55 @@ To create environment on AWS and deploy my project, I ran `eb create`, and CLI p
 1. Enter Environment Name (default: fastapi-songs-env): press Enter for default <br >
 2. Enter DNS CNAME prefix (default: fastapi-songs-dev): press Enter for default <br >
 3. Select a load balancer type: select application<br >
-4. Would you like to enable Spot Fleet requests for this environment? (y/N): No<br >
 
-## EC2 SSH
-## DNS CNAME Prefix
+While creating environment for my project, I encountered several issues and noted them as below: <br >
+1. Lesson learned: __AWS Linux log checking__ <sub>[35][36]</sub><br >
+   - Issue:  My project deployed failed after running `eb create`<br >
+   - Reason: Error log - __ERROR Instance deployment failed. For details, see 'eb-engine.log'.__ <br >
+   - Fix: I connected to AWS Linux to checked error message in 'eb-engine.log' as follows: <br >
+      1. `eb list`   #list running environments <br >
+      2. `eb ssh`    #access AWS Linux by SSH <br >
+      3. `sudo less /var/log/eb-engine.log`   #open and read eb-engine.log <br >
+2. Lesson learned: First-time SSH confirmation to a new EC2 instance <br >
+   - Issue: When first using SSH to access Amazon Linux - EC2 instance (`eb ssh`), EB CLI displayed: <br >
+   > INFO: Running ssh -i /home/.ssh/aws-eb -o IdentitiesOnly yes ec2-user@0.0.0.0 The authenticity of host can't be established. This SSH key is not known by any other names. Are you sure you want to continue connecting (yes/no/[fingerprint])?
+   - Reason: This is a warning shown when using SSH connecting to a new EC2 instance for the first time<br >
+   - Fix: I type `Yes` and pressed Enter which added EC2 server's fingerprint to my `~/.ssh/known_hosts`, allowiing automatic trust for future connections to EC2 instance. <br >
+3. Lesson learned: __Profile__ and __requirements.txt__ files are required when running `eb create` <br >
+   - Issue: During `eb create`, EB logs showed error message as follows: <br >
+   > [WARN] failed to read file /var/pids/web.pid with error: open /var/pids/web.pid: no such file or directory <br >
+   > [ERROR] update processes [web healthd cfn-hup nginx] pid symlinks failed with error failed to read file /var/pids/web.pid after 6 attempts <br >
+   - Reason: EB expected my app started __web server process__ and write its __PID__ to __/var/pids/web.pid__ <br >
+   - Fix: I created Procfile and generated requirements.txt as follows:<sub>[37][38]</sub> <br >
+     1. Procfile: <br >
+      ```Vbnet
+      web: gunicorn src.fastapi_songs.main:app --workers=4 --worker-class=uvicorn.workers.UvicornWorker
+      ```
+     2. requirements.txt: <br >
+      ```Bash
+      poetry run python -m pip freeze > requirements.txt
+      ```
+4. Lesson learned: A new EC2 instance starts as an empty Linux system, and we have to install all packages we need to match what we have in local project. <br > 
+   - Issue:
+     > [ERROR] An error occurred during execution of command [app-deploy] - [InstallDependency]. Stop running the command. Error: fail to install dependencies with requirements.txt file with error Command /var/app/venv/staging-LQM1lest/bin/pip install -r requirements.txt failed with error exit status 1. Stderr: ERROR: Error [Errno 2] No such file or directory: 'git' while executing command git version ERROR: Cannot find command 'git' - do you have 'git' installed and in your PATH?
+   - Reason: The EB deployment failed because it tried to install my project using Git SSH dependency from `requirements.txt`, but the new EC2 Linux instance doesn't have Git installed. <br >
+   - Fix: The EB deployment doesn't need Git. The proper workflow is: develop project locally with Git -> commit, push, and create a pull request -> deploy to EC2. The quick fix is comment out the Git SSH dependency in `requirements.txt`:
+     ```Bash
+     -e git+ssh://git@github.com/raylai-proj/fastapi_songs.git
+     ```
+     and redeploy by `eb deploy`.<sub>[39]</sub> <br >
+     
+## EC2 SSH <br >
+What is EC2 SSH? EC2 is Elastic Compute Cloud instance (linux operating system) which I selected to run my project in AWS. SSH is Secure Shell which is encrypted network protocol for remote access to servers. EC2 SSH refers to using SSH to remotely connect to the AWS EC2 instance (Amazon Linux), so I can run commands, install packages, and do trouble shootings.<sub>[40]</sub> <br >
+## DNS CNAME Prefix <br >
+What is DNS CNAME Prefix? When deploying app delivered by the project on aws, Elastic Beanstalk will create a DNS name with CNAME as prefix e.g., `<CNAME-prefix>.<region>.elasticbeanstalk.com`. For example, if I choose __fastapi-songs-dev__ as my CNAME, my DNS would be:
+```Bash
+fastapi-songs-dev.<region>.elasticbeanstalk.com
+```
+Therefore, the DNS CNAME prefix is the subdomain name for the EB environment’s default public URL.<sub>[41]</sub> <br >
 ## Load Balancer
+What is Load Balancer? The Elastic Load Balancer is an aws service that helps distribute network traffic to prevent traffic bottlenecks. In my project, I chose Application Load Balancer which helps distribute income network traffic between EC2 instances, containers, and IP addresses ensuring each registered node remains healthy.<sub>[42][43][44]</sub> <br >
+## Configuring Environment from `eb create` and `eb deploy` <br >
 ## gunicorn
 ## Docker
 ## PostgresSQL
@@ -238,4 +282,14 @@ To create environment on AWS and deploy my project, I ran `eb create`, and CLI p
 [32] [Github - pyenv](https://github.com/pyenv/pyenv)<br >
 [33] [How do I get my AWS Access ID and Secret Key for EB CLI?](https://www.reddit.com/r/aws/comments/zfr0m6/how_do_i_get_my_aws_access_id_and_secret_key_for/)<br >
 [34] [Managing Elastic Beanstalk user policies](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/AWSHowTo.iam.managed-policies.html)<br >
+[35] [Troubleshooting your Elastic Beanstalk environment](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/troubleshooting.html)<br >
+[36] [[Viewing logs from Amazon EC2 instances in your Elastic Beanstalk environment](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.logging.html)]<br >
+[37] [Buildfile and Procfile](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/platforms-linux-extend.build-proc.html)<br >
+[38] [Setting up your Python development environment for Elastic Beanstalk](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/python-development-environment.html)<br >
+[39] [eb deploy](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb3-deploy.html)<br >
+[40] [eb ssh](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb3-ssh.html)<br >
+[41] [eb create](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb3-create.html)<br >
+[42] [What is Load Balancing?](https://aws.amazon.com/what-is/load-balancing/)<br >
+[43] [What is an Application Load Balancer?](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html))<br >
+[44] [AWS Elastic Load Balancer: Overview And Types With Practical](https://medium.com/%40Raghvendra_Tyagi/aws-elastic-load-balancer-overview-and-types-with-practical-c214cbdfdd9b)<br >
 
