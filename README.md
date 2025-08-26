@@ -93,7 +93,7 @@ The models.py inherits Base from database.py and define Song's database structur
 What is Elastic Beanstalk?   Elastic Beanstalk is a __Platform-as-a-Service (PaaS)__ that helps users to deploy their applications on AWS while integrating multiple AWS services. In this project, the main AWS services I used include, __Elastic Compute Cloud (EC2)__, Relational Database Service (RDS)__, and __Elastic Load Balancing (ELB)__. I used Elastic Beanstalk to deploy my apps, and while I selected `db.t3.micro` as my database instance class, the Elastic Beanstalk automatically selected `t3.micro, t3.small` as my EC2 instance type and assigned me EC2 when I deployed applications.<sub>[1][28]</sub><br >
 To utilize Elastic Beanstalk, I followed tutorial to install Elastic Beanstalk command line interface (EB CLI).<sub>[29][30][31]</sub> The EB CLI is a tool let me setup, configure, deploy, and manage my Elastic Beanstalk application in linux.<sub>[30]</sub><br >
 ## Initialize Project
-To initialize my project, I ran `eb init`, and CLI prompts:<br >
+To initialize EB CLI configuration on my project, I ran `eb init`, and CLI prompts:<br >
 1. Select Default Region: Tokyo, Japan <br >
 2. What's you application name (default: fastapi_songs): press Enter for default <br >
 3. What's Platform and Platform Branch: Python 3.11 running on 64-bit Amazon Linux 2023 <br >
@@ -184,6 +184,13 @@ While setting up my app on AWS, I encountered several issues and took note as be
    }
    ```
    5. I clicked __Next__ and added Policy name `s3PutBucketOwnershipControls` -> __Create policy__ <br >
+## Create Project Environment on AWS and deploy the project <br >
+To create environment on AWS and deploy my project, I ran `eb create`, and CLI prompts: <br >
+1. Enter Environment Name (default: fastapi-songs-env): press Enter for default <br >
+2. Enter DNS CNAME prefix (default: fastapi-songs-dev): press Enter for default <br >
+3. Select a load balancer type: select application<br >
+4. Would you like to enable Spot Fleet requests for this environment? (y/N): No<br >
+
 ## EC2 SSH
 ## DNS CNAME Prefix
 ## Load Balancer
