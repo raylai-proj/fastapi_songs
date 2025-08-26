@@ -239,6 +239,7 @@ Therefore, the DNS CNAME prefix is the subdomain name for the EB environment’s
 What is Load Balancer? The Elastic Load Balancer is an aws service that helps distribute network traffic to prevent traffic bottlenecks. In my project, I chose Application Load Balancer which helps distribute income network traffic between EC2 instances, containers, and IP addresses ensuring each registered node remains healthy.<sub>[42][43][44]</sub> <br >
 ## Configuring Environment from `eb create` and `eb deploy` <br >
 ## gunicorn
+## Configuring Database
 ## Docker
 ## PostgresSQL
 ## psycopg2-binary
