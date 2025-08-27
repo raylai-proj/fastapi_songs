@@ -238,7 +238,78 @@ Therefore, the DNS CNAME prefix is the subdomain name for the EB environment’s
 ## Load Balancer
 What is Load Balancer? The Elastic Load Balancer is an aws service that helps distribute network traffic to prevent traffic bottlenecks. In my project, I chose Application Load Balancer which helps distribute income network traffic between EC2 instances, containers, and IP addresses ensuring each registered node remains healthy.<sub>[42][43][44]</sub> <br >
 ## Configuring Environment from `eb create` and `eb deploy` <br >
-## gunicorn
+The `eb create` creates an environment on AWS for deploying my project, and I have to configure the environment, so the EC2 instance can locate my project during deployment.<br >
+1. Define __PYTHONPATH__ and __WSGIPath__ to let EC2 instance locate application entry point during deployment:<br >
+.ebextensions/01_fastapi.config
+```yaml
+option_settings:
+    aws:elasticbeanstalk:application:environment:
+        PYTHONPATH: "/var/app/current/src:$PYTHONPATH"
+    aws:elasticbeanstalk:container:python:
+        WSGIPath: "src/fastapi_songs/main:app"
+```
+2. Define __container\_commands__ for database initialization: <br >
+.ebextensions/01_fastapi.config
+```yaml
+container_commands:
+    01_initdb:
+        command: |
+            source /var/app/venv/*/bin/activate
+            cd /var/app/current
+            PYTHONPATH=./src python3 src/fastapi_songs/init_db.py
+        leader_only: true
+```
+3. Add Procfile commands for EB to start FastAPI application on the web server. <br >
+Procfile
+```Procfile
+web: gunicorn src.fastapi_songs.main:app --workers=4 --worker-class=uvicorn.workers.UvicornWorker
+```
+1. Lesson learned: Python __src layout__ mismatch in optional settings in 01_fastapi/config <br >
+   - Issue: <br >
+   ```Bash
+   [ERROR] Command 01_initdb (source /var/app/venv/*/bin/activate && python3 src/fastapi_songs/init_db.py) failed <br >
+   ```
+   - Reason: During `eb deploy`, EC2 failed in executing command `01_init_db` when deploying app. <br >
+   - Fix: Direct testing in EC2 to further find the issue: <br >
+   ```Bash
+   (staging-LQM1lest) [ec2-user@ip- staging]$ python3 src/fastapi_songs/init_db.py
+   ```
+2. Lesson learned: When using src layout, I have to include `PYTHONPATH = ./src`, so Python can resolve fastapi_songs/ as a module.<sub>[45]</sub> <br >
+   - Issue:<br >
+   > Traceback (most recent call last): File "/var/app/staging/src/fastapi_songs/init_db.py",
+   > line 12, in <module> from fastapi_songs.database import Base, engine, session_local ModuleNotFoundError: No module named 'fastapi_songs'
+   - Reason: When using the __src layout__, Python doesn’t automatically treat `src/` as the package root on EC2. <br >
+   - Fix: Add `PYTHONPATH = ./src` in 01_init_db command:
+     ```yaml
+     container_commands:
+       01_initdb:
+           command: |
+               source /var/app/venv/*/bin/activate
+               cd /var/app/current
+               PYTHONPATH=./src python3 src/fastapi_songs/init_db.py
+           leader_only: true
+     ```
+## PYTHONPATH <br >
+Does `PYTHONPATH` in `PYTHONPATH: "/var/app/current/src:$PYTHONPATH"` in _.extensions/01_fastapi_songs.config_ search for Python interpreter or files in the project that has entry point ? `PYTHONPATH` is __not for finding Python interpreter__. Instead, it's used by Python to determine __where to search for modules and packages__ when running Python code on EC2.<sub>[45][46]</sub><br >
+
+## WSGIPath <br >
+1. Why does Elastic Beanstalk use `WSGIPath` in _.extensions/01_fastapi_songs.config_? Elastic Beanstalk’s Python platform historically expects WSGI applications (like Flask or Django), and that's why the variable name is WSGIPath, but it’s just the name of the key that EC2 uses to know where to find the application entry point, and it doesn’t mean the app must strictly be WSGI. <sub>[47]</sub><br >
+2. How does FastAPI (ASGI) work with WSGIPath? <sub>[46][48][49]</sub><br >
+   - Although FastAPI is ASGI, ASGI servers like Uvicorn or Gunicorn+Uvicorn workers can still be launched by EB.<br >
+   - EB uses WSGIPath as a pointer which points to "src/fastapi_songs/main:app" to find the app entry point. <br >
+   - Finally, I configure __Procfile__ to instruct EB to run Gunicorn (which is WSGI) + uvicorn (which is ASGI and run fastapi_songs). <br >
+
+## Procfile <br >
+What is Procfile and what does a Procfile do? __Procfile__ is a text file with command, and the EB run the command when starting my web app. The Procfile defines how the web server start. <sub>[49][50][51]</sub><br >
+
+## Gunicorn <br >
+What is Gunicorn and what does it do? Gunicorn (Green unicorn) is a Python WSGI HTTP Server. In my project, Gunicorn is supported by Elastic Beanstalk as a web WSGI application and can be used to support FastAPI and Uvicorn which enable ASGI compatibility.<sub>[48][50]</sub> In my Procfile: <br >
+```Procfile
+web: gunicorn src.fastapi_songs.main:app --workers=4 --worker-class=uvicorn.workers.UvicornWorker
+```
+When EB started the web app server, it started gunicorn and used 4 concurrent Uvicorn workers to run my app in `src/fastapi_songs/maiin:app`. <br >
+
+
 ## Configuring Database
 ## Docker
 ## PostgresSQL
@@ -291,6 +362,13 @@ What is Load Balancer? The Elastic Load Balancer is an aws service that helps di
 [40] [eb ssh](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb3-ssh.html)<br >
 [41] [eb create](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb3-create.html)<br >
 [42] [What is Load Balancing?](https://aws.amazon.com/what-is/load-balancing/)<br >
-[43] [What is an Application Load Balancer?](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html))<br >
+[43] [What is an Application Load Balancer?](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html)<br >
 [44] [AWS Elastic Load Balancer: Overview And Types With Practical](https://medium.com/%40Raghvendra_Tyagi/aws-elastic-load-balancer-overview-and-types-with-practical-c214cbdfdd9b)<br >
+[45] [PYTHONPATH](https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH)<br >
+[46] [Using the Elastic Beanstalk Python platform](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-container.html)<br >
+[47] [Platform specific options](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-specific.html#command-options-python)<br >
+[48] [Server Workers - Uvicorn with Workers](https://fastapi.tiangolo.com/deployment/server-workers/)<br >
+[49] [Uvicorn - Deployment](https://www.uvicorn.org/deployment/)<br >
+[50] [Configuring the WSGI server with a Procfile on Elastic Beanstalk](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/python-configuration-procfile.html)<br >
+[51] [Advanced environment customization with configuration files (.ebextensions)](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions.html)<br >
 
