@@ -311,8 +311,8 @@ When EB started the web app server, it started gunicorn and used 4 concurrent Uv
 
 ## Configuring Database <br >
 In addition to SQLite, the tutorial also provided PostgreSQL and AWS RDS Postgres for database deployment. <br >
-For local postgreSQL: <br >
-1. Start a new docker container with postgreSQL sesrver: <br >
+### local postgreSQL Setup: <br >
+1. Start a new docker container with postgreSQL server:<sub>[52]</sub> <br >
 ```Bash
 docker run -d \
 --name fastapi-songs-postgres \
@@ -322,17 +322,110 @@ docker run -d \
 -p 5432:5432 \
 postgres
 ```
-2. Check if container is running: <br >
+2. Check if container is running:<sub>[53]</sub> <br >
 ```Bash
 docker ps -f name=fastapi-songs-postgres
 ```
-## Docker
-## PostgresSQL
-## psycopg2-binary
-## AWS RDS Postgres
-# Lessons Learned
-## os
-## RDS variables
+3. Add postgreSQL database info in database.py: <br >
+```Python
+USER = "fastapi-songs"
+PW = "complexpassword123"
+HOST = "localhost"
+PORT = "5432"
+DATABASE = "fastapi-songs"
+POSTGRESQL_URL = f"postgresql://{user}:{pw}@{host}:{port}/{database}"
+engine = create_engine(POSTGRESQL_URL)
+session_local = sessionmaker(bind=engine, autoflush=False)
+```
+4. Add `psycopg2-binary in poetry: <br >
+```Bash
+poetry add --group dev "psycopy2-binary=2.9.3"
+```
+5. Run the project in local with postgreSQL: <br >
+```Bash
+poetry run python src/fastapi_songs/init_db.py
+poetry run fastapi_songs
+```
+1. Lesson learned: Docker has container with postgreSQL installed: <br >
+   - Issue: I want to quickly use postgreSQL. <br >
+   - Reason: Docker can start a new container with postgreSQL server. <br >
+   - Fix: Install Docker:<sub>[54]</sub> <br >
+   ```Bash
+   sudo apt install gnome-terminal
+   sudo apt-get update
+   sudo apt-get install -y ./docker-desktop-amd64.deb
+   ```
+2. Lesson learned: Unable to install psycopg2-binary 2.9.3 <br >
+   - Issue: <br >
+   ```Bash
+   Error: pg_config executable not found. | | pg_config is required to build psycopg2 from source.
+   Please add the directory | containing pg_config to the $PATH or specify the full executable path
+   ```
+   - Reason: To install `psycopg2-binary`, The prerequest files `libpq-dev python3-dev build-essential` must install first:<sub>[55]</sub> <br >
+   - Fix: <br >
+   ```Bash
+   sudo apt-get update
+   sudo apt-get install -y libpq-dev python3-dev build-essential
+   ```
+
+### Docker<br >
+What is Docker and what does it do? Docker is a lightweight tool provides application independency and database support. Docker allows developers to isolate different app environments, preventing software and library version conflicts. In addition, Docker provides containers with PostgreSQL server pre-installed, so developers can use it directly without additional database setup.<sub>[56]</sub><br >
+
+### PostgresSQL<br >
+What is PostgreSQL and what does it do? PostgreSQL is a open source object-relational database system which works great with FastAPI application.<sub>[57][58]</sub><br >
+
+### psycopg2-binary<br >
+What is pyscopg2-binary and what does it do?<br >
+> __Psycopg__ is a __PostgreSQL__ adapter for the __Python__ programming language. It is a wrapper for the __libpq__, the official PostgreSQL client library.<sub>[55]</sub><br >
+### AWS RDS Postgres Setup:<br >
+1. `eb console` -> left sidebar select __Configuration__ -> in __Networking and database__, click __Edit__<br >
+2. Configure database info: <br >
+   - Engine: Postgres<br >
+   - Instance Class : db.t3.micro<br >
+   - Storage: 5 GB<br >
+   - Username: <username><br >
+   - Password: <password><br >
+   - Availability: low<br >
+   - Database deletion policy: Create Snapshot<br >
+3. After __Apply__, the environment will gear with postgreSQL, and it will automatically generate environment variables in os.environ: <br >
+   - RDS_USERNAME<br >
+   - RDS_PASSWORD<br >
+   - RDS_HOSTNAME<br >
+   - RDS_PORT<br >
+   - RDS_DB_NAME<br >
+4. Add environment variables in database.py:<br >
+```Python
+try:
+    user = os.environ["RDS_USERNAME"]
+    pw = os.environ["RDS_PASSWORD"]
+    host = os.environ["RDS_HOSTNAME"]
+    port = os.environ["RDS_PORT"]
+    database = os.environ["RDS_DB_NAME"]
+
+except Exception as e:
+    print(e)
+
+finally:
+    postgersql_url = f"postgresql://{user}:{pw}@{host}:{port}/{database}"
+    engine = create_engine(postgersql_url)
+```
+
+1. Lesson learned: The __auto-generated__ environment variables will detached after next `eb deploy`.<br >
+   - Issue: <br >
+   ```Bash
+   'RDS_USERNAME' Traceback (most recent call last):
+   sqlalchemy.exc.OperationalError: (psycopg2.OperationalError) connection to server at "localhost" (127.0.0.1),
+   port 5432 failed: Connection refused Is the server running on that host and accepting TCP/IP connections?
+   ```
+   - Reason: Elastic Beanstalk may detach __auto-generated__ environment variables once `eb deploy` failed or redeploy environment. <br >
+   - Fix: Manually setup environment variables:<sub>[59]</sub><br >
+      1. `eb console` -> left sidebar select __Configuration__ -> in __Updates, monitoring, and logging __, click __Edit__<br >
+      2. In __Environment properties__, click __Add environment property__ and fill in:<br >
+         - RDS_USERNAME: `eb console` -> __Configuration__ -> Networking and database -> __Edit__ -> Username<br >
+         - RDS_PASSWORD: `eb console` -> __Configuration__ -> Networking and database -> __Edit__ -> Password<br >
+         - RDS_HOSTNAME: https://console.aws.amazon.com/rds -> __DB Instances__ -> Connectivity & security -> Endpoint<br >
+         - RDS_PORT: https://console.aws.amazon.com/rds -> __DB Instances__ -> Connectivity & security -> Port<br >
+         - RDS_DB_NAME: `eb console` -> __Configuration__ -> Networking and database -> Database username<br >
 
 # Reference
 [1] [Deploying a FastAPI Application to Elastic Beanstalk](https://testdriven.io/blog/fastapi-elastic-beanstalk/#environment-variables)<br >
@@ -386,4 +479,12 @@ docker ps -f name=fastapi-songs-postgres
 [49] [Uvicorn - Deployment](https://www.uvicorn.org/deployment/)<br >
 [50] [Configuring the WSGI server with a Procfile on Elastic Beanstalk](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/python-configuration-procfile.html)<br >
 [51] [Advanced environment customization with configuration files (.ebextensions)](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions.html)<br >
+[52] [docker container run](https://docs.docker.com/reference/cli/docker/container/run/)<br >
+[53] [docker container ls](https://docs.docker.com/reference/cli/docker/container/ls/)<br >
+[54] [Install Docker Desktop on Ubuntu](https://docs.docker.com/desktop/setup/install/linux/ubuntu/)<br >
+[55] [Psycopg 2.9.10 documentation - Build prerequisites](https://www.psycopg.org/docs/install.html#build-prerequisites)<br >
+[56] [What is Docker?](https://docs.docker.com/get-started/docker-overview/)<br >
+[57] [PostgreSQL](https://www.postgresql.org/)<br >
+[58] [What is PostgreSQL?](https://www.digitalocean.com/community/tutorials/what-is-postgresql)<br >
+[59] [Environment variables and other software settings](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/environments-cfg-softwaresettings.html)<br >
 
