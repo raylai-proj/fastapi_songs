@@ -309,8 +309,23 @@ web: gunicorn src.fastapi_songs.main:app --workers=4 --worker-class=uvicorn.work
 ```
 When EB started the web app server, it started gunicorn and used 4 concurrent Uvicorn workers to run my app in `src/fastapi_songs/maiin:app`. <br >
 
-
-## Configuring Database
+## Configuring Database <br >
+In addition to SQLite, the tutorial also provided PostgreSQL and AWS RDS Postgres for database deployment. <br >
+For local postgreSQL: <br >
+1. Start a new docker container with postgreSQL sesrver: <br >
+```Bash
+docker run -d \
+--name fastapi-songs-postgres \
+-e POSTGRES_USER=fastapi-songs \
+-e POSTGRES_PASSWORD=complexpassword123 \
+-e POSTGRES_DB=fastapi-songs \
+-p 5432:5432 \
+postgres
+```
+2. Check if container is running: <br >
+```Bash
+docker ps -f name=fastapi-songs-postgres
+```
 ## Docker
 ## PostgresSQL
 ## psycopg2-binary
